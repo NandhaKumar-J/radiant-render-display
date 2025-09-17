@@ -27,7 +27,7 @@ export const DataCard = ({
           <h3 className="font-semibold text-lg text-card-foreground group-hover:text-primary transition-colors">
             {layoutName}
           </h3>
-          <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+          <Badge variant="secondary" className="bg-success/10 text-success border border-success/20">
             Active
           </Badge>
         </div>
@@ -42,8 +42,8 @@ export const DataCard = ({
         {(outstandingBalance || availableBalance) && (
           <div className="grid grid-cols-2 gap-4">
             {outstandingBalance && (
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <div className="bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 rounded-lg p-3">
+                <p className="text-xs font-medium text-accent uppercase tracking-wide">
                   Outstanding
                 </p>
                 <p className="text-sm font-semibold text-foreground mt-1">
@@ -52,8 +52,8 @@ export const DataCard = ({
               </div>
             )}
             {availableBalance && (
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <div className="bg-gradient-to-br from-success/5 to-success/10 border border-success/20 rounded-lg p-3">
+                <p className="text-xs font-medium text-success uppercase tracking-wide">
                   Available
                 </p>
                 <p className="text-sm font-semibold text-foreground mt-1">
