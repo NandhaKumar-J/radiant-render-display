@@ -3,6 +3,12 @@ import { DataCard } from "./DataCard";
 import { SearchBar } from "./SearchBar";
 import { FilterSelect } from "./FilterSelect";
 import { Pagination } from "./Pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface DataItem {
   id: string;
@@ -111,7 +117,35 @@ export const DataGrid = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<"instruments" | "counterparty">("instruments");
+  const [selectedItem, setSelectedItem] = useState<string>("");
   const itemsPerPage = 6;
+
+  const handleInstrumentsClick = (layoutName: string) => {
+    setSelectedItem(layoutName);
+    setDialogType("instruments");
+    setDialogOpen(true);
+  };
+
+  const handleCounterpartyClick = (layoutName: string) => {
+    setSelectedItem(layoutName);
+    setDialogType("counterparty");
+    setDialogOpen(true);
+  };
+
+  // Sample data for dialog cards
+  const dialogData = useMemo(() => {
+    return Array.from({ length: 6 }, (_, i) => ({
+      id: `dialog-${i + 1}`,
+      layoutName: `${dialogType === "instruments" ? "Instrument" : "Counterparty"} ${i + 1}`,
+      limitNode: `${Math.floor(Math.random() * 900000) + 100000}/XXX`,
+      outstandingBalance: `$${(Math.random() * 3000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      availableBalance: `$${(Math.random() * 2000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      instruments: "Details",
+      counterpartyList: "Info",
+    }));
+  }, [dialogType]);
 
   const filteredData = useMemo(() => {
     return sampleData.filter((item) => {
@@ -159,9 +193,14 @@ export const DataGrid = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {paginatedData.map((item) => (
-          <DataCard key={item.id} {...item} />
-        ))}
+          {paginatedData.map((item) => (
+            <DataCard 
+              key={item.id} 
+              {...item} 
+              onInstrumentsClick={() => handleInstrumentsClick(item.layoutName)}
+              onCounterpartyClick={() => handleCounterpartyClick(item.layoutName)}
+            />
+          ))}
       </div>
 
       {paginatedData.length === 0 && (
@@ -177,6 +216,21 @@ export const DataGrid = () => {
           onPageChange={setCurrentPage}
         />
       )}
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {dialogType === "instruments" ? "Instruments" : "Counterparty List"} - {selectedItem}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {dialogData.map((item) => (
+              <DataCard key={item.id} {...item} />
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

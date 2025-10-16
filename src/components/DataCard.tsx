@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, FileText, Users } from "lucide-react";
+import { FileText, Users } from "lucide-react";
 
 interface DataCardProps {
   layoutName: string;
@@ -10,6 +10,8 @@ interface DataCardProps {
   availableBalance?: string;
   instruments: string;
   counterpartyList: string;
+  onInstrumentsClick?: () => void;
+  onCounterpartyClick?: () => void;
 }
 
 export const DataCard = ({
@@ -19,6 +21,8 @@ export const DataCard = ({
   availableBalance,
   instruments,
   counterpartyList,
+  onInstrumentsClick,
+  onCounterpartyClick,
 }: DataCardProps) => {
   return (
     <Card className="group bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border-0">
@@ -68,6 +72,7 @@ export const DataCard = ({
           <Button
             variant="outline"
             size="sm"
+            onClick={onInstrumentsClick}
             className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
           >
             <FileText className="w-4 h-4 mr-1" />
@@ -76,6 +81,7 @@ export const DataCard = ({
           <Button
             variant="outline" 
             size="sm"
+            onClick={onCounterpartyClick}
             className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
           >
             <Users className="w-4 h-4 mr-1" />
