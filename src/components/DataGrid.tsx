@@ -118,6 +118,7 @@ const sampleData: DataItem[] = [
 export const DataGrid = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [rowType, setRowType] = useState<"counterparty" | "customer">("customer");
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"instruments" | "counterparty">("instruments");
@@ -200,6 +201,11 @@ export const DataGrid = () => {
     { value: "reliance", label: "Reliance" },
   ];
 
+  const rowTypeOptions = [
+    { value: "counterparty", label: "Counterparty" },
+    { value: "customer", label: "Customer" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -214,6 +220,11 @@ export const DataGrid = () => {
             onChange={setSelectedFilter}
             options={filterOptions}
           />
+          <FilterSelect
+            value={rowType}
+            onChange={(value) => setRowType(value as "counterparty" | "customer")}
+            options={rowTypeOptions}
+          />
         </div>
         <div className="text-sm text-muted-foreground">
           Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredData.length)} of {filteredData.length} records
@@ -227,6 +238,7 @@ export const DataGrid = () => {
               {...item} 
               onInstrumentsClick={() => handleInstrumentsClick(item.layoutName)}
               onCounterpartyClick={() => handleCounterpartyClick(item.layoutName)}
+              showCounterparty={rowType === "customer"}
             />
           ))}
       </div>

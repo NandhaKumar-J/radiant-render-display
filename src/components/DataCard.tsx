@@ -12,6 +12,7 @@ interface DataCardProps {
   counterpartyList: string;
   onInstrumentsClick?: () => void;
   onCounterpartyClick?: () => void;
+  showCounterparty?: boolean;
 }
 
 export const DataCard = ({
@@ -23,6 +24,7 @@ export const DataCard = ({
   counterpartyList,
   onInstrumentsClick,
   onCounterpartyClick,
+  showCounterparty = true,
 }: DataCardProps) => {
   return (
     <Card className="group bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border-0">
@@ -78,15 +80,17 @@ export const DataCard = ({
             <FileText className="w-4 h-4 mr-1" />
             {instruments}
           </Button>
-          <Button
-            variant="outline" 
-            size="sm"
-            onClick={onCounterpartyClick}
-            className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
-          >
-            <Users className="w-4 h-4 mr-1" />
-            {counterpartyList}
-          </Button>
+          {showCounterparty && (
+            <Button
+              variant="outline" 
+              size="sm"
+              onClick={onCounterpartyClick}
+              className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+            >
+              <Users className="w-4 h-4 mr-1" />
+              {counterpartyList}
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
