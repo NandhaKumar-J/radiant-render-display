@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface DataItem {
   id: string;
@@ -135,18 +136,44 @@ export const DataGrid = () => {
     setDialogOpen(true);
   };
 
-  // Sample data for dialog cards
-  const dialogData = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => ({
-      id: `dialog-${i + 1}`,
-      layoutName: `${dialogType === "instruments" ? "Instrument" : "Counterparty"} ${i + 1}`,
-      limitNode: `${Math.floor(Math.random() * 900000) + 100000}/XXX`,
+  // Sample data for approved instruments
+  const approvedData = useMemo(() => {
+    return Array.from({ length: 4 }, (_, i) => ({
+      id: `approved-${i + 1}`,
+      layoutName: `Approved Instrument ${i + 1}`,
+      limitNode: `${Math.floor(Math.random() * 900000) + 100000}/APR`,
       outstandingBalance: `$${(Math.random() * 3000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
       availableBalance: `$${(Math.random() * 2000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
       instruments: "Details",
       counterpartyList: "Info",
     }));
-  }, [dialogType]);
+  }, []);
+
+  // Sample data for rejected instruments
+  const rejectedData = useMemo(() => {
+    return Array.from({ length: 3 }, (_, i) => ({
+      id: `rejected-${i + 1}`,
+      layoutName: `Rejected Instrument ${i + 1}`,
+      limitNode: `${Math.floor(Math.random() * 900000) + 100000}/REJ`,
+      outstandingBalance: `$${(Math.random() * 3000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      availableBalance: `$${(Math.random() * 2000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      instruments: "Details",
+      counterpartyList: "Info",
+    }));
+  }, []);
+
+  // Sample data for counterparty dialog
+  const counterpartyData = useMemo(() => {
+    return Array.from({ length: 6 }, (_, i) => ({
+      id: `counterparty-${i + 1}`,
+      layoutName: `Counterparty ${i + 1}`,
+      limitNode: `${Math.floor(Math.random() * 900000) + 100000}/CPT`,
+      outstandingBalance: `$${(Math.random() * 3000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      availableBalance: `$${(Math.random() * 2000000 + 500000).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      instruments: "Details",
+      counterpartyList: "Info",
+    }));
+  }, []);
 
   const filteredData = useMemo(() => {
     return sampleData.filter((item) => {
@@ -225,11 +252,31 @@ export const DataGrid = () => {
               {dialogType === "instruments" ? "Instruments" : "Counterparty List"} - {selectedItem}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3 mt-4">
-            {dialogData.map((item) => (
-              <RowCard key={item.id} {...item} />
-            ))}
-          </div>
+          
+          {dialogType === "instruments" ? (
+            <Tabs defaultValue="approved" className="mt-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="approved">Approved</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              </TabsList>
+              <TabsContent value="approved" className="flex flex-col gap-3 mt-4">
+                {approvedData.map((item) => (
+                  <RowCard key={item.id} {...item} />
+                ))}
+              </TabsContent>
+              <TabsContent value="rejected" className="flex flex-col gap-3 mt-4">
+                {rejectedData.map((item) => (
+                  <RowCard key={item.id} {...item} />
+                ))}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <div className="flex flex-col gap-3 mt-4">
+              {counterpartyData.map((item) => (
+                <RowCard key={item.id} {...item} />
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
