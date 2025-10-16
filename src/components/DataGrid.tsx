@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { DataCard } from "./DataCard";
+import { RowCard } from "./RowCard";
 import { SearchBar } from "./SearchBar";
 import { FilterSelect } from "./FilterSelect";
 import { Pagination } from "./Pagination";
@@ -224,9 +225,9 @@ export const DataGrid = () => {
               {dialogType === "instruments" ? "Instruments" : "Counterparty List"} - {selectedItem}
             </DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          <div className="flex flex-col gap-3 mt-4">
             {dialogData.map((item) => (
-              <DataCard key={item.id} {...item} />
+              <RowCard key={item.id} {...item} />
             ))}
           </div>
         </DialogContent>
