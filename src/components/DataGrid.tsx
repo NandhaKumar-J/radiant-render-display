@@ -4,6 +4,8 @@ import { RowCard } from "./RowCard";
 import { SearchBar } from "./SearchBar";
 import { FilterSelect } from "./FilterSelect";
 import { Pagination } from "./Pagination";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -123,23 +125,42 @@ export const DataGrid = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"instruments" | "counterparty">("instruments");
   const [selectedItem, setSelectedItem] = useState<string>("");
+  const [dialogPage, setDialogPage] = useState(1);
+  const [goToPage, setGoToPage] = useState("");
   const itemsPerPage = 6;
+  const dialogItemsPerPage = 5;
 
   const handleInstrumentsClick = (layoutName: string) => {
     setSelectedItem(layoutName);
     setDialogType("instruments");
+    setDialogPage(1);
+    setGoToPage("");
     setDialogOpen(true);
   };
 
   const handleCounterpartyClick = (layoutName: string) => {
     setSelectedItem(layoutName);
     setDialogType("counterparty");
+    setDialogPage(1);
+    setGoToPage("");
     setDialogOpen(true);
+  };
+
+  const handleGoToPage = () => {
+    const pageNum = parseInt(goToPage);
+    const maxPage = dialogType === "instruments" 
+      ? Math.max(Math.ceil(approvedData.length / dialogItemsPerPage), Math.ceil(rejectedData.length / dialogItemsPerPage))
+      : Math.ceil(counterpartyData.length / dialogItemsPerPage);
+    
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxPage) {
+      setDialogPage(pageNum);
+      setGoToPage("");
+    }
   };
 
   // Sample data for approved instruments
   const approvedData = useMemo(() => {
-    return Array.from({ length: 4 }, (_, i) => ({
+    return Array.from({ length: 12 }, (_, i) => ({
       id: `approved-${i + 1}`,
       layoutName: `Approved Instrument ${i + 1}`,
       limitNode: `${Math.floor(Math.random() * 900000) + 100000}/APR`,
@@ -152,7 +173,7 @@ export const DataGrid = () => {
 
   // Sample data for rejected instruments
   const rejectedData = useMemo(() => {
-    return Array.from({ length: 3 }, (_, i) => ({
+    return Array.from({ length: 8 }, (_, i) => ({
       id: `rejected-${i + 1}`,
       layoutName: `Rejected Instrument ${i + 1}`,
       limitNode: `${Math.floor(Math.random() * 900000) + 100000}/REJ`,
@@ -165,7 +186,7 @@ export const DataGrid = () => {
 
   // Sample data for counterparty dialog
   const counterpartyData = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => ({
+    return Array.from({ length: 15 }, (_, i) => ({
       id: `counterparty-${i + 1}`,
       layoutName: `Counterparty ${i + 1}`,
       limitNode: `${Math.floor(Math.random() * 900000) + 100000}/CPT`,
@@ -258,37 +279,71 @@ export const DataGrid = () => {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               {dialogType === "instruments" ? "Instruments" : "Counterparty List"} - {selectedItem}
             </DialogTitle>
           </DialogHeader>
           
-          {dialogType === "instruments" ? (
-            <Tabs defaultValue="approved" className="mt-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="approved">Approved</TabsTrigger>
-                <TabsTrigger value="rejected">Rejected</TabsTrigger>
-              </TabsList>
-              <TabsContent value="approved" className="flex flex-col gap-3 mt-4">
-                {approvedData.map((item) => (
+          <div className="flex-1 overflow-y-auto">
+            {dialogType === "instruments" ? (
+              <Tabs defaultValue="approved" className="mt-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="approved">Approved</TabsTrigger>
+                  <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                </TabsList>
+                <TabsContent value="approved" className="flex flex-col gap-3 mt-4">
+                  {approvedData.slice((dialogPage - 1) * dialogItemsPerPage, dialogPage * dialogItemsPerPage).map((item) => (
+                    <RowCard key={item.id} {...item} />
+                  ))}
+                </TabsContent>
+                <TabsContent value="rejected" className="flex flex-col gap-3 mt-4">
+                  {rejectedData.slice((dialogPage - 1) * dialogItemsPerPage, dialogPage * dialogItemsPerPage).map((item) => (
+                    <RowCard key={item.id} {...item} />
+                  ))}
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="flex flex-col gap-3 mt-4">
+                {counterpartyData.slice((dialogPage - 1) * dialogItemsPerPage, dialogPage * dialogItemsPerPage).map((item) => (
                   <RowCard key={item.id} {...item} />
                 ))}
-              </TabsContent>
-              <TabsContent value="rejected" className="flex flex-col gap-3 mt-4">
-                {rejectedData.map((item) => (
-                  <RowCard key={item.id} {...item} />
-                ))}
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <div className="flex flex-col gap-3 mt-4">
-              {counterpartyData.map((item) => (
-                <RowCard key={item.id} {...item} />
-              ))}
+              </div>
+            )}
+          </div>
+
+          <div className="border-t pt-4 mt-4 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder="Go to page"
+                  value={goToPage}
+                  onChange={(e) => setGoToPage(e.target.value)}
+                  className="w-32"
+                  min="1"
+                  max={Math.ceil((dialogType === "instruments" ? Math.max(approvedData.length, rejectedData.length) : counterpartyData.length) / dialogItemsPerPage)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleGoToPage();
+                    }
+                  }}
+                />
+                <Button onClick={handleGoToPage} variant="outline" size="sm">
+                  Go
+                </Button>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Page {dialogPage} / {Math.ceil((dialogType === "instruments" ? Math.max(approvedData.length, rejectedData.length) : counterpartyData.length) / dialogItemsPerPage)}
+              </div>
             </div>
-          )}
+            <Pagination
+              currentPage={dialogPage}
+              totalPages={Math.ceil((dialogType === "instruments" ? Math.max(approvedData.length, rejectedData.length) : counterpartyData.length) / dialogItemsPerPage)}
+              onPageChange={setDialogPage}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
